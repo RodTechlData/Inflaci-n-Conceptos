@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conceptos de Inflación. Chile</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Incluir Roboto para la fuente principal -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Definición de la animación de flotación */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Estilos personalizados para la tarjeta fija */
+        body {
+            font-family: 'Roboto', sans-serif;
+            /* Fondo principal degradado Amarillo Oro con Naranja Suave más oscuro */
+            background: linear-gradient(135deg, #fbc457 0%, #f7a950 50%, #f38f48 100%); 
+            background-attachment: fixed; 
+            color: #1a202c; 
+        }
+        
+        /* Contenedor principal de la tarjeta */
+        .flashcard-container {
+            width: 90%; 
+            max-width: 494px; 
+            /* Se mantiene una altura fija para la estética */
+            height: 325px; 
+            margin-top: 2.5rem; 
+        }
+        
+        /* La tarjeta ahora es solo un contenedor de contenido, sin el efecto 3D */
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: box-shadow 0.3s;
+            border-radius: 1.25rem; 
+            background: linear-gradient(135deg, #3b82f6 0%, #fb923c 100%); 
+            padding: 1.5rem; 
+            color: #ffffff; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+            /* Animación de flotación más sutil (sin rotación) */
+            animation: float 4s ease-in-out infinite; 
+            
+            /* Sombra exterior */
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.75), 
+                0 0 30px #f38f48, 
+                0 0 60px rgba(243, 143, 72, 0.5); 
+        }
+
+        /* Contenedor Verde Suave para Pregunta/Respuesta */
+        .text-container-soft-green {
+            background-color: rgba(16, 185, 129, 0.15); /* bg-emerald-500/15 */
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            width: 100%;
+            margin-top: 0.5rem; 
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Estilo para el contenedor del panel de control de botones */
+        .control-panel {
+            background-color: rgba(0, 0, 0, 0.1); 
+            padding: 1rem;
+            border-radius: 1.5rem; 
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 90%; 
+            max-width: 600px;
+        }
+
+
+        /* Ajuste proporcional de fuentes */
+        .text-sm-small { font-size: 0.95rem; }
+        .text-base-large { font-size: 1.15rem; }
+        .text-question {
+            font-size: 1.7rem; 
+            line-height: 1.3;
+            font-weight: 800; 
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); 
+        }
+        .text-answer {
+            font-size: 1.4rem; 
+            line-height: 1.4;
+            font-weight: 800; 
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6); 
+        }
+
+        /* Estilos para los botones */
+        .button-control {
+            @apply px-6 py-3 sm:px-9 sm:py-4 rounded-3xl font-bold text-sm sm:text-base transition duration-300 whitespace-nowrap uppercase tracking-wider;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3); 
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .button-primary {
+            @apply button-control bg-orange-500 text-white hover:bg-orange-600 shadow-lg shadow-orange-500/50;
+        }
+        .button-secondary {
+            @apply button-control bg-blue-900 bg-opacity-10 text-white hover:bg-opacity-20;
+        }
+        .button-disabled {
+            @apply opacity-40 cursor-not-allowed shadow-none; 
+        }
+        
+        /* Estilo para el título */
+        .main-title {
+            color: #1a202c; 
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            font-weight: 800;
+            font-size: 3.5rem; 
+        }
+        
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <h1 class="text-3xl sm:text-5xl font-extrabold mb-8 text-center main-title">
+        Conceptos de Inflación
+    </h1>
+
+    <p id="card-status" class="text-base font-medium mb-6"></p>
+
+    <div class="flashcard-container">
+        <!-- La tarjeta ya no es un contenedor 3D, es el contenedor de contenido fijo -->
+        <div id="card" class="flashcard">
+            <!-- El contenido se inyecta aquí -->
+        </div>
+    </div>
+
+    <!-- Contenedor con cantos redondeados para los botones -->
+    <div class="control-panel mt-12">
+        <div class="flex space-x-4 sm:space-x-8 w-full justify-center">
+            <button id="prev-btn" class="button-secondary" disabled>← Anterior</button>
+            <button id="flip-btn" class="button-primary">Mostrar Respuesta</button>
+            <button id="next-btn" class="button-secondary">Siguiente →</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Array completo de 50 preguntas y respuestas
+        const flashcardsData = [
+            // --- Preguntas Iniciales (1-10) ---
+            {
+                question: "Según el borrador del documento, ¿cuál fue uno de los principales factores de presión inflacionaria en Chile durante el período 2020-2024, además de la pandemia y la guerra en Ucrania?",
+                answer: "Los retiros de fondos previsionales (causa local que generó un shock de liquidez relevante)."
+            },
+            {
+                question: "¿En qué década la inflación en Chile superó tasas del 500% anual, según el análisis histórico del documento?",
+                answer: "Década del 70 y 80 (período de hiperinflación)."
+            },
+            {
+                question: "Desde la perspectiva de los 'Ganadores y Perdedores', ¿quiénes se benefician generalmente de un contexto inflacionario en Chile?",
+                answer: "Los deudores, quienes pagan sus obligaciones con dinero que vale menos en términos de poder adquisitivo real."
+            },
+            {
+                question: "El documento de análisis establece que la inflación puede ser causada por tres factores principales. ¿Cuáles son?",
+                answer: "Exceso de demanda, aumento de costos o políticas monetarias expansivas (inflación de demanda, costos y monetaria)."
+            },
+            {
+                question: "¿Quiénes son los actores que sufren un mayor deterioro del poder adquisitivo en Chile a causa de la inflación?",
+                answer: "Las clases medias y bajas, incluyendo asalariados con ingresos fijos, pensionados y ahorristas."
+            },
+            {
+                question: "¿Qué hito marcó una etapa de mayor estabilidad inflacionaria en Chile a partir de la década de los 90?",
+                answer: "La instauración del régimen de metas de inflación y la autonomía del Banco Central."
+            },
+            {
+                question: "Según la conclusión del paper, ¿qué dos aspectos se hacen evidentes como necesarios en Chile para enfrentar los ciclos inflacionarios?",
+                answer: "Políticas públicas para proteger a los más vulnerables y una sólida educación financiera."
+            },
+            {
+                question: "¿Cuál es la principal diferencia entre la perspectiva clásica de Adam Smith ('mano invisible') y la práctica económica moderna en la formación de precios?",
+                answer: "La práctica moderna reconoce que las distorsiones (monopolios, oligopolios, intervenciones) afectan la formación de precios, a diferencia de la teoría pura."
+            },
+            {
+                question: "El documento menciona que la inflación no es solo un fenómeno monetario. ¿Qué otras dos naturalezas se le atribuyen en el análisis?",
+                answer: "Política y estructural."
+            },
+            {
+                question: "¿A qué se refiere el término 'Fin del superciclo de materias primas' mencionado en el podcast 'Chile Económico'?",
+                answer: "A la baja en los precios de exportación de Chile, como el cobre, tras un período de auge."
+            },
+            // --- Preguntas Adicionales (11-50) ---
+            // (Se omite el resto del array por brevedad en el comentario, pero está completo en el código)
+            { question: "¿Qué concepto introdujo Adam Smith que sugiere la autorregulación de los mercados?", answer: "La 'mano invisible'." },
+            { question: "Además del exceso de demanda y el aumento de costos, ¿cuál es el tercer factor principal de la inflación mencionado en el documento?", answer: "Políticas monetarias expansivas." },
+            { question: "¿Qué tipo de distorsiones de mercado se mencionan en el documento que afectan la formación de precios en la práctica económica moderna?", answer: "Monopolios, oligopolios, intervenciones estatales y externalidades." },
+            { question: "La inflación, según su definición económica, es el aumento sostenido y ¿qué más?", answer: "Generalizado de precios." },
+            { question: "¿Qué significa que la inflación sea de 'demanda'?", answer: "Que es causada por un exceso de gasto o liquidez en la economía." },
+            { question: "¿Qué significa que la inflación sea de 'costos'?", answer: "Que es causada por un aumento en los costos de producción (ej. precio del petróleo, salarios)." },
+            { question: "¿Qué naturaleza (además de monetaria) se le atribuye a la inflación debido a las decisiones de gasto o déficit del gobierno?", answer: "Naturaleza política." },
+            { question: "¿Qué naturaleza (además de monetaria) se le atribuye a la inflación debido a las rigideces o la concentración de poder en ciertos sectores de la economía?", answer: "Naturaleza estructural." },
+            { question: "¿Qué herramienta utiliza el Banco Central para influir directamente en los niveles de inflación?", answer: "El ajuste de la Tasa de Política Monetaria (TPM) o la masa monetaria." },
+            { question: "¿En qué se diferencia la visión teórica pura de libre mercado de la práctica real en cuanto a la formación de precios?", answer: "En la práctica real existen múltiples formas de intervención y distorsiones que rompen el ideal de la oferta y demanda puras." },
+            { question: "¿Cuál fue la tasa de inflación anual máxima aproximada que alcanzó Chile en el período 2020-2024, según el documento?", answer: "Cercana al 14% anual (alrededor de 2022)." },
+            { question: "¿Qué sistema institucional adoptó Chile en los años 90 para mantener la inflación más estable?", answer: "El régimen de metas de inflación." },
+            { question: "¿Qué condición es esencial para el éxito del régimen de metas de inflación?", answer: "La autonomía del Banco Central (BCCh)." },
+            { question: "¿Qué se entiende por 'autonomía' del Banco Central de Chile?", answer: "Que el BCCh puede tomar decisiones de política monetaria sin presiones del gobierno o del poder político." },
+            { question: "¿Qué busca el régimen de metas de inflación al establecer un rango para el IPC?", answer: "Anclar las expectativas de inflación de los agentes económicos." },
+            { question: "¿Qué evento político y social se menciona en el podcast como un factor que exacerbó la inestabilidad en Chile antes de la pandemia?", answer: "El estallido social de octubre de 2019." },
+            { question: "¿Por qué la pandemia (2020) causó inflación a nivel global y en Chile?", answer: "Por shocks de oferta (problemas en cadenas de suministro) y shocks de demanda (ayudas estatales y ahorro)." },
+            { question: "¿Qué factor externo se combinó con los retiros de fondos previsionales para generar una 'tormenta perfecta' inflacionaria en Chile?", answer: "La guerra en Ucrania (que elevó precios de energía y alimentos)." },
+            { question: "¿Qué efecto tiene generalmente la subida de la Tasa de Política Monetaria (TPM) por parte del Banco Central?", answer: "Encarece el crédito, desincentiva el consumo y la inversión, y ayuda a enfriar la demanda para bajar la inflación." },
+            { question: "¿Cuál es el rango meta de inflación que históricamente ha manejado el Banco Central de Chile?", answer: "Alrededor del 3% anual, con un rango de tolerancia." },
+            { question: "¿Por qué los asalariados con ingresos fijos son considerados perdedores en un contexto inflacionario?", answer: "Porque el poder adquisitivo de su salario disminuye hasta que se aplica un reajuste." },
+            { question: "¿Por qué los deudores se consideran 'ganadores' de la inflación?", answer: "Porque la deuda (su monto nominal) se mantiene fija, pero se paga con dinero que vale menos en términos reales." },
+            { question: "¿Qué tipo de inversionistas se protegen de la inflación al tener activos que se ajustan automáticamente?", answer: "Inversionistas con activos indexados a la inflación (ej. UF, bonos indexados)." },
+            { question: "¿Qué grupo social sufre un mayor deterioro del poder adquisitivo, según el análisis del documento?", answer: "Las clases medias y bajas." },
+            { question: "¿Qué es la 'erosión del poder adquisitivo'?", answer: "La pérdida de capacidad de compra de una moneda debido a la inflación." },
+            { question: "¿Qué tipo de medida se sugiere en la conclusión del documento para proteger a los más vulnerables de los efectos de la inflación?", answer: "Políticas públicas específicas de protección." },
+            { question: "¿Qué habilidad individual se sugiere fomentar en la conclusión para ayudar a las personas a mitigar los efectos de la inflación?", answer: "Educación financiera." },
+            { question: "¿Por qué un ahorrista con dinero en una cuenta corriente (sin interés) pierde dinero con la inflación?", answer: "Porque el valor real de su ahorro disminuye constantemente al no generar rendimiento y mantenerse fijo." },
+            { question: "¿Cuál es la función principal de la Unidad de Fomento (UF) en Chile en relación con la inflación?", answer: "Ajustar los precios, deudas, contratos y valores para que mantengan su valor real." },
+            { question: "¿Qué fenómeno económico opuesto a la inflación puede ser igual de perjudicial si se mantiene en el tiempo?", answer: "La deflación (bajada generalizada y sostenida de precios)." },
+            { question: "¿Qué metal es mencionado en el podcast como central en el 'superciclo de materias primas' de Chile?", answer: "El cobre." },
+            { question: "¿Qué país se menciona en el podcast como el principal cliente que redujo la compra de materias primas, contribuyendo al 'fin del superciclo'?", answer: "China." },
+            { question: "¿A qué se refiere el conductor del podcast con la metáfora de la 'montaña rusa económica de Chile'?", answer: "A los ciclos de auge y caída que ha experimentado la economía chilena en la última década." },
+            { question: "¿Qué concepto económico de la década pasada se utiliza en el podcast para describir el auge económico de Chile?", answer: "El 'jaguar de América Latina'." },
+            { question: "¿Cómo describe el podcast el período posterior al 'fin del superciclo de materias primas'?", answer: "Como la primera 'bajada fuerte' en la montaña rusa económica." },
+            { question: "Además del 'superciclo', el 'estallido social' y la 'pandemia', ¿cuál es el cuarto factor de inestabilidad mencionado en el podcast?", answer: "La polarización política." },
+            { question: "¿Qué señales positivas de recuperación económica menciona el podcast hacia el final de su análisis?", answer: "La inflación está cediendo y el empleo se está fortaleciendo." },
+            { question: "¿Según el documento, ¿por qué la intervención del Banco Central, aunque estratégica, distorsiona el ideal de neutralidad del mercado?", answer: "Porque afecta la equidad económica y rompe la autorregulación pura." },
+            { question: "¿Qué rol juega el precio del dólar en la inflación chilena, dado que es una economía abierta?", answer: "Un dólar alto encarece las importaciones (bienes y combustibles) y contribuye a la inflación de costos." },
+            { question: "¿Cuál es el principal objetivo del podcast 'Chile Económico' mencionado en la conclusión?", answer: "Promover una ciudadanía bien informada para tomar mejores decisiones económicas." }
+        ];
+
+        let currentCardIndex = 0;
+        let isAnswerShown = false; // Cambiado de isFlipped a isAnswerShown
+
+        // Referencias a los elementos del DOM
+        const cardDisplay = document.getElementById('card');
+        const flipBtn = document.getElementById('flip-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const cardStatus = document.getElementById('card-status');
+
+        // Función para renderizar la tarjeta actual (MODIFICADA PARA SER FIJA)
+        function renderCard() {
+            const data = flashcardsData[currentCardIndex];
+            
+            // Si la respuesta está mostrada, la volvemos a ocultar al cambiar de tarjeta
+            isAnswerShown = false; 
+
+            // Construye el HTML con la pregunta visible y la respuesta oculta inicialmente
+            const cardHtml = `
+                <span class="text-sm-small font-light mb-2 opacity-80">${isAnswerShown ? 'Respuesta' : `Pregunta ${currentCardIndex + 1} de ${flashcardsData.length}`}</span>
+                <div id="question-container" class="text-container-soft-green">
+                    <p class="text-question">${data.question}</p>
+                </div>
+                <div id="answer-container" class="text-container-soft-green hidden">
+                    <p class="text-answer">${data.answer}</p>
+                </div>
+                <p id="hint-text" class="text-base-large mt-4 italic opacity-70">Haz clic en el botón para ver la respuesta.</p>
+            `;
+            
+            cardDisplay.innerHTML = cardHtml;
+            flipBtn.textContent = 'Mostrar Respuesta';
+            updateControls();
+        }
+
+        // Función para mostrar/ocultar la respuesta (MODIFICADA PARA SER FIJA)
+        function flipCard() {
+            isAnswerShown = !isAnswerShown;
+            
+            const questionContainer = document.getElementById('question-container');
+            const answerContainer = document.getElementById('answer-container');
+            const hintText = document.getElementById('hint-text');
+
+            if (isAnswerShown) {
+                questionContainer.classList.add('hidden');
+                answerContainer.classList.remove('hidden');
+                hintText.classList.add('hidden');
+                flipBtn.textContent = 'Volver a Pregunta';
+            } else {
+                questionContainer.classList.remove('hidden');
+                answerContainer.classList.add('hidden');
+                hintText.classList.remove('hidden');
+                flipBtn.textContent = 'Mostrar Respuesta';
+            }
+        }
+
+        // Función para actualizar el estado de los botones
+        function updateControls() {
+            cardStatus.textContent = `Pregunta ${currentCardIndex + 1} de ${flashcardsData.length}`;
+            
+            const isFirst = currentCardIndex === 0;
+            const isLast = currentCardIndex === flashcardsData.length - 1;
+
+            // Anterior
+            prevBtn.disabled = isFirst;
+            prevBtn.classList.toggle('button-disabled', isFirst);
+            
+            // Siguiente
+            nextBtn.disabled = isLast;
+            nextBtn.classList.toggle('button-disabled', isLast);
+        }
+
+        // Manejadores de eventos (Se elimina el clic en la tarjeta para el modo fijo)
+        flipBtn.addEventListener('click', flipCard);
+        
+        // Manejadores de navegación
+        prevBtn.addEventListener('click', () => {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                renderCard();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentCardIndex < flashcardsData.length - 1) {
+                currentCardIndex++;
+                renderCard();
+            }
+        });
+
+        // Inicializar la aplicación
+        window.onload = renderCard;
+
+    </script>
+</body>
+</html>
